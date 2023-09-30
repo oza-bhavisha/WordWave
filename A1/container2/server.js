@@ -7,20 +7,16 @@ app.use(express.json());
 
 // Defining a POST endpoint for handling temperature requests
 app.post('/temperature', (req, res) => {
-  // Extract data 
   const { file, name, key } = req.body;
 
-  // Case-1: Check if 'file' is missing in the request
   if (!file) {
     return res.status(400).json({ file: null, error: 'Invalid JSON input.' });
   }
 
-  // Case-2: Check if the specified file exists in the '/docker_volume' directory
   if (!fs.existsSync(`/etc/data/${file}`)) {
     return res.status(404).json({ file, error: 'File not found.' });
   }
 
-  // Check if the 'key' is 'temperature'
   if (key === 'temperature') {
     const csvStream = fs.createReadStream(`/etc/data/${file}`)
       .pipe(csv({ columns: true }));
