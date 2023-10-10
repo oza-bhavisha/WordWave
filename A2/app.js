@@ -8,12 +8,14 @@ const port = 80;
 
 app.use(bodyParser.json());
 
+
 AWS.config.update({
     accessKeyId: process.env.accessKeyId,
     secretAccessKey: process.env.secretAccessKey,
     sessionToken: process.env.sessionToken,
   });
-  
+
+ 
 // All the S3 contents are referred from the URL: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html
 const s3 = new AWS.S3()
 
