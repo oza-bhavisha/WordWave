@@ -1,0 +1,24 @@
+services:
+  container1:
+    build:
+      context: ./container1
+    image: bhavishaoza/a1-container1
+    container_name: container1_bhavisha
+    ports:
+      - "6000:6000"
+    networks:
+      - dockera1_shared_network
+    volumes:
+      - .:/etc/data
+
+  container2:
+    build:
+      context: ./container2
+    image: bhavishaoza/a1-container2
+    container_name: container2_bhavisha
+    networks:
+      - dockera1_shared_network
+    volumes:
+      - .:/etc/data
+networks:
+  dockera1_shared_network:
