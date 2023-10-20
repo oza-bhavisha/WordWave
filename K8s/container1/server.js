@@ -60,7 +60,7 @@ app.post('/get-temperature', (req, res) => {
     return  res.json({ file, error: 'File not found.'});
   }
 
-  
+  // Adding testing comment
 
   axios
     .post('http://container1-service:7000/get-temp', { file, name, key: 'temperature' })
