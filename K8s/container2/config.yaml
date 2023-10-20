@@ -1,3 +1,4 @@
+# config creation has been referred from : "https://kubernetes.io/docs/concepts/configuration/overview/"
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
