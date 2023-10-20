@@ -1,58 +1,71 @@
 const express = require('express');
 const app = express();
 const fs = require('fs');
-const csv = require('csv-parser');
+const csv = require('csv-parse');
+const {parse} = csv;
+const { Console } = require("console");
+
+
+// make a new logger
+const myLogger = new Console({
+  stdout: fs.createWriteStream("/Bhavisha_PV_dir/normalStdout.txt"),
+  stderr: fs.createWriteStream("/Bhavisha_PV_dir/errStdErr.txt"),
+});
+
 
 app.use(express.json());
 
-// Defining a POST endpoint for handling temperature requests
-app.post('/temperature', (req, res) => {
-  const { file, name, key } = req.body;
 
-  if (!file) {
+
+app.post('/get-temp', (req, res) => {
+  const { file, name, key } = req.body;
+  if (!file) { 
+
     return res.status(400).json({ file: null, error: 'Invalid JSON input.' });
   }
+ console.log("D")
+  try{
+  const filePath = "/Bhavisha_PV_dir/" + file;
 
-  if (!fs.existsSync(`/etc/data/${file}`)) {
-    return res.status(404).json({ file, error: 'File not found.' });
+    let temp = 0;
+
+    fs.createReadStream(filePath).pipe(parse()).on("error",(e)=>{
+      console.log(e)
+      myLogger.error(e);
+
+      return res.json({
+        file:file,
+        error:"Input file not in CSV format."
+      })
+    }).on("data",(d)=>{
+       
+      if(d[0]==name){
+       
+        temp = d[3]
+        
+      }
+    }).on('end',()=>{
+      console.log("Comp")
+
+
+      console.log({
+        file:file,temperature:parseInt(temp)
+      })
+
+      return res.json({
+        file:file,temperature:parseInt(temp)
+      })
+    })
+    console.log(7)
+
   }
-
-  if (key === 'temperature') {
-    const csvStream = fs.createReadStream(`/etc/data/${file}`)
-      .pipe(csv({ columns: true }));
-
-    const filteredData = [];
-
-    csvStream.on('data', (row) => {
-      if (row.name === name) {
-        filteredData.push(row);
-      }
-    });
-
-    csvStream.on('end', () => {
-      // Check if no data was found for the specified user
-      if (filteredData.length === 0) {
-        return res.status(404).json({ file, error: 'User not found in the CSV.' });
-      }
-
-      const latestTemperature = filteredData[filteredData.length - 1];
-      const response = {
-        file,
-        temperature: parseInt(latestTemperature.temperature),
-      };
-      res.json(response);
-    });
-
-    csvStream.on('error', (err) => {
-      console.error(err);
-      res.status(500).json({ file, error: 'Error reading the file.' });
-    });
-  } else {
-    res.status(400).json({ file, error: 'Invalid key provided.' });
+  catch(error){
+    myLogger.error(error);
+    res.json({file,error:error})
   }
 });
 
-const port = 6001;
+const port = 7000;
 app.listen(port, () => {
   console.log(`Container 2 listening on port ${port}`);
 });
