@@ -63,7 +63,7 @@ app.post('/get-temperature', (req, res) => {
   // Adding testing comment
 
   axios
-    .post('http://container1-service:7000/get-temp', { file, name, key: 'temperature' })
+    .post('http://container2-service:7000/get-temp', { file, name, key: 'temperature' })
     .then((response) => {
       console.log(response.data)
       res.json(response.data);
