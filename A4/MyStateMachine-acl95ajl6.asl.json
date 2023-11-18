@@ -1,5 +1,5 @@
 {
-  "Comment": "State Machine for Cloud A4",
+  "Comment": "State Machine A4",
   "StartAt": "isSHA256",
   "States": {
     "isSHA256": {
