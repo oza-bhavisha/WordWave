@@ -1,0 +1,39 @@
+.homepage {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .post-preview {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .post-preview:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .post-title {
+    margin: 0 0 10px 0;
+    color: #333;
+  }
+  
+  .post-link {
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.3s ease;
+  }
+  
+  .post-link:hover {
+    color: #0056b3;
+  }
+  
+  .post-summary {
+    color: #666;
+    font-size: 16px;
+  }
+  
