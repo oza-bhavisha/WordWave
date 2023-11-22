@@ -16,7 +16,6 @@ const BlogPost = () => {
     <div>
       <h1>{post.title}</h1>
       <p>{post.content}</p>
-      {/* Display other post details like author and date */}
     </div>
   ) : (
     <div>Loading...</div>

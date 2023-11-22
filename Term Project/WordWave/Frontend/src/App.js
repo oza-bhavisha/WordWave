@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import NavBar from './ui/NavBar';
-import HomePage from './HomePage';
-import BlogPost from './ui/BlogPost';
-import CreatePost from './CreatePost';
+import NavBar from './views/NavBar';
+import HomePage from './views/HomePage';
+import BlogPost from './views/BlogPost';
+import CreatePost from './views/CreatePost';
 
 function App() {
   return (
