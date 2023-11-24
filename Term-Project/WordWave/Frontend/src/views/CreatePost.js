@@ -5,6 +5,7 @@ import './HomePage';
 import './BlogPost';
 
 const CreatePost = () => {
+  const blog_id = "23";
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,7 +13,7 @@ const CreatePost = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const postData = { title, content };
+    const postData = { blog_id, title, content };
 
     fetch('http://localhost:4000/posts', {
       method: 'POST',

@@ -8,7 +8,7 @@ const BlogPost = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`https://your-backend-api/posts/${id}`)
+    fetch(`http://localhost:4000/posts/${id}`)
       .then(response => response.json())
       .then(data => setPost(data))
       .catch(error => console.error('Error fetching post:', error));
