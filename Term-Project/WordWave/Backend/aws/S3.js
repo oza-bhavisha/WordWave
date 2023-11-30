@@ -3,7 +3,7 @@ const uuid = require("uuid");
 
 const s3 = new AWS.S3();
 
-const bucketName = "blg-cld";
+const bucketName = "blg-images-bhavisha";
 
 const storeFile = async (file) => {
   const ext = file.originalname.split(".");

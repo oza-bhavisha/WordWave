@@ -1,0 +1,245 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation Script.
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: blg-images-bhavisha
+
+Resources:
+  Application:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-0fc5d935ebf8bc3bc
+      InstanceType: t2.micro
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet:
+            - !Ref ApplicationSecurityGroup
+      UserData:
+        "Fn::Base64": !Sub |
+          #!/bin/bash
+          # Your custom script or commands go here
+          echo "Hello, this is the EC2 instance user data script!"
+          sudo apt update -y
+          sudo apt install git
+          sudo apt install -y curl
+          curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+          sudo apt install -y nodejs
+          sudo apt install npm -y
+          cd home/ubuntu
+          git clone https://boza:glpat-Sz3Uwxc24MTSu3xNs-kw@git.cs.dal.ca/courses/2023-fall/csci5409/boza.git
+          echo "Clone completed"
+          cd boza/Term-Project/WordWave/Backend
+          sudo npm install
+          echo "Nm installed"
+          sudo npm install pm2 -g
+          echo "Pm2 installed"
+          pm2 start app.js
+          echo "Backend started"
+          pm2 save
+          cd ../Frontend
+          sudo npm install
+          public_ip=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/public-ipv4)
+          sudo REACT_APP_BACKEND=$public_ip npm run build
+          cd build
+          sudo iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
+          echo "Build completed"
+          sudo npm install -g serve
+          serve -s -l 3000
+          echo "Frontend running on 3000"
+
+  ApplicationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group to enable ssh access and opened Http on 4000 and 80 port numbers
+      VpcId: vpc-0a4effdb576a47577
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 4000
+          ToPort: 4000
+          CidrIp: 0.0.0.0/0
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: users
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  DynamoDbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: blogs
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Function: !GetAtt Lambda.Arn
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: false
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${Bucket}/*"
+      Bucket: !Ref Bucket
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: "true"
+        Origins:
+          - DomainName: !GetAtt Bucket.DomainName
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          ViewerProtocolPolicy: "redirect-to-https"
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: "false"
+            Cookies:
+              Forward: "none"
+      Tags:
+        - Key: name
+          Value: images
+
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: myLambda
+      Runtime: nodejs16.x
+      Handler: index.handler
+      Timeout: 30
+      Role: arn:aws:iam::011445076892:role/LabRole
+      Code:
+        ZipFile: |
+          const AWS = require("aws-sdk");
+
+          const comprehend = async (document) => {
+            AWS.config.update({
+              region: "us-east-1",
+              accessKeyId: "AKIAZZSAVDBKX5GFH3VT",
+              secretAccessKey: "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",
+            });
+
+            const comprehend = new AWS.Comprehend();
+
+            const params = {
+              Text: document,
+              LanguageCode: "en",
+            };
+
+            return await comprehend.detectKeyPhrases(params).promise();
+          };
+
+          const dynamoDB = async (id, values) => {
+            AWS.config.update({
+              region: "us-east-1",
+              accessKeyId: "ASIA4I4RYHGWZWPDJWEZ",
+              secretAccessKey: "knE7b5YhKf0akCOmpIae6WMeFr110SdLi0OCZsMv",
+              sessionToken:
+                "FwoGZXIvYXdzEJr//////////wEaDHzxp+KE/YG/R4ucbCLAAaC0qoWEIqeuyH6eQ/jBkizzfTknkmrdpJLZwoXlX+j/bl4217hd0EIFci2uG7hmC1C5dNz3r0eUniz9kzYP1/HL4wLf1X4yuybVNe+Qllu9dEDOJjDy5h6Eze4LvKxDqVDi4ctRRjuaTRAMWxqMrGZomPXWZpclMn7KJAgn09z9FHY8i39CGmjiYXljN62L0ak0vradZnpP/MvUXYokYFMcNFqnC0lC2VIQfwpgfIi2xCSdKhxbPtJX+fTtZipNxyjsp5+rBjItG1kZCv16mWxoSd/KxyW2JRD03M7ZNQUfFyE2nQtWYe1Z9bRVvDIeSW88kOnW",
+            });
+
+            const docClient = new AWS.DynamoDB.DocumentClient();
+
+            const params = {
+              TableName: "blogs",
+              Key: {
+                id,
+              },
+              UpdateExpression: "SET #searchValues = :searchValues",
+              ExpressionAttributeNames: {
+                "#searchValues": "searchValues",
+              },
+              ExpressionAttributeValues: {
+                ":searchValues": values,
+              },
+              ReturnValues: "ALL_NEW",
+            };
+
+            return new Promise((resolve, reject) => {
+              docClient.update(params, (err, data) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(data);
+                }
+              });
+            });
+          };
+
+          exports.handler = async (event) => {
+            try {
+              const content = event.content;
+              const id = event.id;
+              const title = event.title;
+
+              const { KeyPhrases } = await comprehend(content);
+              const searchValues = KeyPhrases.map((val) => val.Text);
+
+              await dynamoDB(id, [...searchValues, title]);
+
+              return content;
+            } catch (e) {
+              console.log(e);
+            }
+          };
+
+
+
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref Lambda
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::${BucketName}
