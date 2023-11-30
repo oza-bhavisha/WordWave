@@ -154,7 +154,7 @@ Resources:
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: myLambda
+      FunctionName: compherendProcessor
       Runtime: nodejs16.x
       Handler: index.handler
       Timeout: 30
