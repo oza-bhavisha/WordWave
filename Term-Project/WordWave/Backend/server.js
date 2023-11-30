@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const Blogs = require("./blogs");
+const Blogs = require("./blog");
 const Users = require("./user");
 
 const app = express();
