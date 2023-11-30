@@ -21,8 +21,8 @@ const HomePage = () => {
     axiosInstance
       .get(
         query
-          ? `http://localhost:4000/blog?search=${query}`
-          : "http://localhost:4000/blog"
+          ? `blog?search=${query}`
+          : "/blog"
       )
       .then(({ data }) => {
         setPosts(data);
