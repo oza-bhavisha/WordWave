@@ -20,8 +20,6 @@ Resources:
       UserData:
         "Fn::Base64": !Sub |
           #!/bin/bash
-          # Your custom script or commands go here
-          echo "Hello, this is the EC2 instance user data script!"
           sudo apt update -y
           sudo apt install git
           sudo apt install -y curl
@@ -30,14 +28,10 @@ Resources:
           sudo apt install npm -y
           cd home/ubuntu
           git clone https://boza:glpat-Sz3Uwxc24MTSu3xNs-kw@git.cs.dal.ca/courses/2023-fall/csci5409/boza.git
-          echo "Clone completed"
           cd boza/Term-Project/WordWave/Backend
           sudo npm install
-          echo "Nm installed"
           sudo npm install pm2 -g
-          echo "Pm2 installed"
           pm2 start server.js
-          echo "Backend started"
           pm2 save
           cd ../Frontend
           sudo npm install
@@ -83,7 +77,7 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  DynamoDbTable:
+  BlogsTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: blogs
@@ -151,10 +145,10 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: compherendProcessor
+      Role: arn:aws:iam::776644284488:role/LabRole
+      Timeout: 30
       Runtime: nodejs16.x
       Handler: index.handler
-      Timeout: 30
-      Role: arn:aws:iam::776644284488:role/LabRole
       Code:
         ZipFile: |
           const AWS = require("aws-sdk");
@@ -177,13 +171,14 @@ Resources:
           };
 
           const dynamoDB = async (id, values) => {
-            AWS.config.update({
+             AWS.config.update({
               region: "us-east-1",
-              accessKeyId: "ASIA4I4RYHGWZWPDJWEZ",
-              secretAccessKey: "knE7b5YhKf0akCOmpIae6WMeFr110SdLi0OCZsMv",
+              accessKeyId: "ASIA3JU43KBEIOOGN5HP",
+              secretAccessKey: "Maf2AtVClBabRjYK5iBSeq3wBFt8C5p657PHXnnv",
               sessionToken:
-                "FwoGZXIvYXdzEJr//////////wEaDHzxp+KE/YG/R4ucbCLAAaC0qoWEIqeuyH6eQ/jBkizzfTknkmrdpJLZwoXlX+j/bl4217hd0EIFci2uG7hmC1C5dNz3r0eUniz9kzYP1/HL4wLf1X4yuybVNe+Qllu9dEDOJjDy5h6Eze4LvKxDqVDi4ctRRjuaTRAMWxqMrGZomPXWZpclMn7KJAgn09z9FHY8i39CGmjiYXljN62L0ak0vradZnpP/MvUXYokYFMcNFqnC0lC2VIQfwpgfIi2xCSdKhxbPtJX+fTtZipNxyjsp5+rBjItG1kZCv16mWxoSd/KxyW2JRD03M7ZNQUfFyE2nQtWYe1Z9bRVvDIeSW88kOnW",
+                "FwoGZXIvYXdzEK3//////////wEaDGfmO4Owt/Ahc4n/CyLAAQt9li8HqOT4P3wg2HhVmSL6WmL5qdQH6K7dC02n2F1AtXvbVU6t38QjQkbcGWBO9SdGNKMxtTgtGRb1lQp+Fwd+kKDDGcchz3ZX8BnkVb9ZoeiAyl5nsTfw7Q/kwInAsYAt4eCGWQXEfy7Dlsq73M1HX7h2wyFLn9SDKN9I0OPBpxz7kvLoC6NoJUQObsCVgqhDCyUNtNdRFRrmIMb+fmrY/c5h0cEftPFJswXyDcmZFGBGf7GFmvu2H3b/tI5CzyiYy6OrBjItoQNCoMXjasBkBwahjAAIsCKxXlEtgDen3vozBSjNRGRWyPBQFklEORqOzYGk",
             });
+    
 
             const docClient = new AWS.DynamoDB.DocumentClient();
 
