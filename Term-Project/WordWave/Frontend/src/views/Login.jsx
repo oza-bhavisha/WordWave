@@ -22,7 +22,7 @@ const Login = () => {
       .post("/user/login", { email: username, password })
       .then(({ data }) => {
         window.localStorage.setItem("token", data.token);
-        window.location.reload();
+        window.location.href="/"
       })
       .catch((error) => {
         setError("Invalid Creds");

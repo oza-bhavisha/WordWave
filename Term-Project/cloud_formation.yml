@@ -101,10 +101,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketName
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: "s3:ObjectCreated:*"
-            Function: !GetAtt Lambda.Arn
       PublicAccessBlockConfiguration:
         RestrictPublicBuckets: false
         BlockPublicAcls: false
@@ -233,13 +229,3 @@ Resources:
               console.log(e);
             }
           };
-
-
-
-  S3InvokeLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref Lambda
-      Principal: s3.amazonaws.com
-      SourceArn: !Sub arn:aws:s3:::${BucketName}
