@@ -20,10 +20,10 @@ const comprehend = async (document) => {
 const dynamoDB = async (id, values) => {
   AWS.config.update({
     region: "us-east-1",
-    accessKeyId: "ASIA4I4RYHGWZWPDJWEZ",
-    secretAccessKey: "knE7b5YhKf0akCOmpIae6WMeFr110SdLi0OCZsMv",
+    accessKeyId: "ASIA3JU43KBED7TWB7AC",
+    secretAccessKey: "JXkk5wQRIqxgQm89KV7E35APwJwcxGUFYBl7T8i5",
     sessionToken:
-      "FwoGZXIvYXdzEJr//////////wEaDHzxp+KE/YG/R4ucbCLAAaC0qoWEIqeuyH6eQ/jBkizzfTknkmrdpJLZwoXlX+j/bl4217hd0EIFci2uG7hmC1C5dNz3r0eUniz9kzYP1/HL4wLf1X4yuybVNe+Qllu9dEDOJjDy5h6Eze4LvKxDqVDi4ctRRjuaTRAMWxqMrGZomPXWZpclMn7KJAgn09z9FHY8i39CGmjiYXljN62L0ak0vradZnpP/MvUXYokYFMcNFqnC0lC2VIQfwpgfIi2xCSdKhxbPtJX+fTtZipNxyjsp5+rBjItG1kZCv16mWxoSd/KxyW2JRD03M7ZNQUfFyE2nQtWYe1Z9bRVvDIeSW88kOnW",
+      "FwoGZXIvYXdzEPz//////////wEaDBIpNG7q8RdCpfHAbyLAAW4qFkK2o/n5Py2WaEjZn/BNyyZhjOERPGL5NdGQOlZVpH5Gb6s9SH2gL78HCc6WW/gzwBDaqBv1FlC4PECBMITgPn2D6TddBHATANel3aFBdOMmMdi4/MyuHN8nPURCWfsdbBgNz1NV+adMTezQp7TL8EZZMnr+4Hp0bhFKpO3Hqv+8Qakz0LEy1jg9lwXFdVSvGVsBqRXSt/40lvyVRSY5gHBe4CPZRTzgdIp09gUuc8T+wAP5v3VabXwGwKruYiiu/bSrBjItSfar2K8qxBWej/RcYH0C80mC/cQPBFDHFQI6U6lkbBnYlRS+cwDgFmiJSooP",
   });
 
   const docClient = new AWS.DynamoDB.DocumentClient();
